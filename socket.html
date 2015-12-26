@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html><!--obrim etqueta html, sempre necessària-->
+  <head><!--obrim etiqueta head, sempre present en documents html-->
+    <title>PiFace Digital WebSocket</title><!--escrivim el títol que volem que es vegi, més tard li donarem estils-->
+    <link rel="shortcut icon" href="favicon.png" type="image/png" /><!--intentem establir una icona, que no es veu-->
+    <meta charset="utf-8"><!--establim el llenguatge-->
+    <meta name="viewport" content="width=device-width"><!--establim l'amplada-->
+    <meta name="author" content="" >
+    <!--<link rel="stylesheet" href="style.css" />-->
+    <style>/*comencem els estils, això es pot posar en un document css per separat*/
+    br { clear:left }/*aliniem a l'esquerra*/
+.menu_simple {
+width: 100%;
+background-color: #6C4A7C;
+}
+.menu_simple ul {
+margin: 0; padding: 0;
+float: center;
+}
+.menu_simple ul li {
+display: inline;
+}
+.menu_simple ul li a {
+float: left; text-decoration: none;
+color: white;
+padding: 10.5px 11px;
+background-color:  #6C4A7C;
+}
+.menu_simple ul li a:visited {
+color: white;
+}
+.menu_simple ul li a:hover, .menu_simple ul li .current {
+color: white;
+background-color: #3F1C50;
+}
+/*mitjançant les anteriors instruccions he aconseguit fer passar una llista a menú
+els menús es fan d'aquesta manera
+ul i li són instruccions per a fer llistes
+a partir d'aquí acabem presentant la llista horitzontalment, definim colors, marges, i hover, que és bàsicament que el menú canviï quan passem el ratolí per sobre*/
+/*td {
+    font-size: 15px;
+    line-height: 20px;
+    padding: 0 20px;
+    text-align: justify;
+    vertical-align: top;
+    width: 50%;
+}
+td.first {
+    border-right: 5px solid #4BB495;
+}aixo era una taula, que feia 2 columnes amb barra al mig. És l'estil del text*/
+
+a {
+display:block;
+text-align:center;
+width:20%; /* fixed width */
+text-decoration:none;
+font-size: 18px;
+font-family:'Helvetica Neue',sans-serif;
+}
+/*hem definit com serà el text del menú, que portarà l'etqiueta a*/
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { text-align: center; }/*aliniem el text que formarà part del cos al centre*/
+      header h1 { 
+        color: #FAF9F4; 
+        font-size: 2.5em; 
+        margin: 0; 
+      }
+      /*definim els estils del header1, una mena de títol*/
+      header h2 { 
+        font-family: helvetica, sans-serif; 
+        font-size: 18px; 
+        color: #FAF9F4; 
+      }
+      /*el mateix pel header2*/
+      .piface { margin-bottom: 42px; 
+        margin-top: 25px; }
+      #pi_logo { vertical-align: middle;}
+      .input_bt, .output_bt { 
+        display: inline-block; 
+        width: 64px; 
+        height: 64px; 
+        border: 3px #447684; 
+        border-radius: 4px; 
+        background: #447684; 
+        color: #999; 
+        font-family: monospace, helvetica; 
+        font-size: 12px; 
+        margin: 6px;
+      }
+      /*especifiquem els estils dels quadres dels inputs i outputs*/
+      .input_bt div, .output_bt div { 
+        font-size: 26px; 
+        margin-top: 6px; 
+      }
+      #host { 
+        background: #6C4A7C;  
+        border: 3px; 
+        border-radius: 4px; 
+        padding: 5px; 
+        color: white; 
+        font-size: 24px; 
+        font-family: sans-serif, helvetica;
+        max-width:300px;
+      }
+      /*establim estils a l'etiqueta on hem d'escriure l'adreça IP*/
+      .footer { 
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        right: 0; 
+        padding: 0 16px; 
+        height: 30px; 
+        line-height: 2em; 
+        color: #ccc; 
+        background: #333333; 
+        background: linear-gradient(#222, #333333) repeat scroll 0% 0% transparent; 
+        border-top: 2px solid #262626; 
+        text-align: right; 
+        font-size: 0.8em; 
+        z-index: 100; 
+      }
+      /*establim estils del footer, una mena de peu de la pàgina*/
+      @media only screen and (max-width: 640px) {
+      .input_bt, .output_bt { 
+        width: 48px; 
+        height: 48px; 
+        border: 1px solid black; 
+        border-radius: 4px; 
+        background: #447684; 
+        color: #999; 
+        font-family: monospace, helvetica; 
+        font-size: 12px; 
+      }
+      /*definim més estils dels quadres pels inputs i outputs*/
+      }
+      @media only screen and (max-width: 320px) {
+      .input_bt, .output_bt { 
+        width: 64px; 
+        height: 64px; 
+        border: 1px solid black; 
+        border-radius: 4px; 
+        background: #447684; 
+        color: #999; 
+        font-family: monospace, helvetica; 
+        font-size: 12px;
+        padding-bottom:10px;
+      }
+      }
+      @media only screen and (min-width: 900px) {
+      .input_bt, .output_bt { 
+        width: 92px; 
+        height: 92px; 
+        border: 4px solid black; 
+        border-radius: 4px;
+       background: #447684; 
+       color: #999; 
+       font-family: monospace, helvetica; 
+       font-size: 12px;
+       padding-bottom:10px;
+      }
+      }
+      label{
+    display: block; /* add this, ja que problema, trec l'escrit de host i el poso a dintre de l'etiqueta. Més pesat de borrar, però més elegant*/
+    padding-top: 10px;
+    width: 15%;
+
+}
+    header { 
+      font-family: sans-serif, montserrat; 
+      vertical-align: middle; 
+      background: #447684;  
+      border-bottom: 6px solid #3f1C50; 
+      padding: 8px; 
+      margin-bottom: 0px; 
+    }
+    
+    .styled-button-5 {
+  background-color:#B2006C;
+  color:#fff;
+  font-family:'Helvetica Neue',sans-serif;
+  font-size:18px;
+  line-height:30px;
+  border-radius:20px;
+  -webkit-border-radius:20px;
+  -moz-border-radius:20px;
+  border:0;
+  /*text-shadow:#C17C3A 0 -2px 0;*/
+  width:135px;
+  height:34px;
+} 
+  .styled-button-5:hover { background: #447684; }
+/*dono estils al botó que he de prémer per a connectar-me després d'escriure l'adreça IP*/
+h2 { 
+  display: block; font-size: 25px;
+  font-family: sans-serif, helvetica;
+  color: #000000; 
+}
+@media only screen and (min-width: 640px) {
+.textaso {
+float:left;
+width:640px;
+margin-left: 1%;
+text-align: justify;
+font-size: 15px;
+}/* centrar el inputs outputs i host amb estils i class */
+}
+/*dono estils al text que es troba a la part final de la pàgina*/
+
+    </style>
+</head>
+<!--tanquem etiquetes de head i dels estils i comencem amb el body, no definirem estil sinó allò que s'ha de posar a la pàgina-->
+<body>
+<header>
+<h1 align="middle">PIFACE DIGITAL CONTROL</h1><!--títol -->
+<h2 align="middle">Interfície pel control de sortides</h2><!--títol-->
+</header>
+<div class="menu_simple">
+<ul>
+<li><a href="https://www.raspberrypi.org/" target="_blank">RPi Web</a></li>
+<li><a href="https://github.com/adcomp/piface-python-websocket-server" target="_blank">Source code</a></li>
+<li><a href="http://saved.io/" target="_blank">Saved .io</a></li>
+<li><a href="http://paletton.com/#uid=1580u0kB6sqngB1u9-rEYn2KPhD" target="_blank">Colors</a></li>
+<li><a href="#">About me</a></li>
+<!--definim els enllaços als quals anirem després de clicar cada botó del menú superior-->
+</ul>
+<br />
+</div>
+  <div id="con_div">
+    <label for="host" padding="20px"></label>
+    <input type="text" id="host" value="Escriu el host" widht="10%"/><!--definim el text del principi que hi haurà al label per escriure la IP-->
+    <input type="submit" class="styled-button-5" value="CONNECTA'T" onclick='connect()' /><!--A veure si el onclick connect el fa igual, lo demés canvia "button" per "submit" i afegim una classe, per referir-nos a l'estil. No tenim id, ara-->
+  </div>
+  <div class="piface">
+  <div id="input">
+    <h2 font-family: Helvetica;>Inputs</h2>
+    <div id="in_0" class="input_bt">0<div id="in_0_state">--</div></div>
+    <div id="in_1" class="input_bt">1<div id="in_1_state">--</div></div>
+    <div id="in_2" class="input_bt">2<div id="in_2_state">--</div></div>
+    <div id="in_3" class="input_bt">3<div id="in_3_state">--</div></div>
+    <div id="in_4" class="input_bt">4<div id="in_4_state">--</div></div>
+    <div id="in_5" class="input_bt">5<div id="in_5_state">--</div></div>
+    <div id="in_6" class="input_bt">6<div id="in_6_state">--</div></div>
+    <div id="in_7" class="input_bt">7<div id="in_7_state">--</div></div>
+  </div>
+  <div id="output">
+    <h2>Outputs</h2>
+    <div id="out_0" class="output_bt" onclick="ws.send('0')">0<div id="out_0_state">--</div></div>
+    <div id="out_1" class="output_bt" onclick="ws.send('1')">1<div id="out_1_state">--</div></div>
+    <div id="out_2" class="output_bt" onclick="ws.send('2')">2<div id="out_2_state">--</div></div>
+    <div id="out_3" class="output_bt" onclick="ws.send('3')">3<div id="out_3_state">--</div></div>
+    <div id="out_4" class="output_bt" onclick="ws.send('4')">4<div id="out_4_state">--</div></div>
+    <div id="out_5" class="output_bt" onclick="ws.send('5')">5<div id="out_5_state">--</div></div>
+    <div id="out_6" class="output_bt" onclick="ws.send('6')">6<div id="out_6_state">--</div></div>
+    <div id="out_7" class="output_bt" onclick="ws.send('7')">7<div id="out_7_state">--</div></div>  
+  </div>
+  <!--establim el que posarem a inputs i outputs. Les classes ens ajuden a adreçarnos a ells pels estils-->
+  </div><!-- piface -->
+<!--<footer class="footer"><a href="#">adcomp</a></footer>-->
+<script>
+var ws = null;
+function connect() {
+  var host = document.getElementById('host').value;
+  ws = new WebSocket("ws://" + host + ":8888/piface");
+ws.onmessage = function(evt) {
+  // console.log(evt.data);
+  var piface = JSON.parse(evt.data);
+  update(piface);
+};
+ws.onclose = function(evt) {
+  console.log("Connection close ..");
+  document.getElementById('host').style["background"] = "#6C4A7C";
+  document.getElementById('input').style["display"] = 'block';/* Aqui en comptes de block hi hauria de tenir none, però sinó se'm mostra al principi, i al fer un clic a connect desapareix. Aixi es veu tot el rato */
+  document.getElementById('output').style["display"] = 'block';
+  document.getElementById("connect").style.visibility = "visible";
+  };
+  ws.onopen = function(evt) {
+    console.log("WebSocket open ..")
+    document.getElementById('host').style["background"] = "#2bb563";
+    document.getElementById("connect").style.visibility = "hidden";
+    document.getElementById('input').style["display"] = 'block';
+    document.getElementById('output').style["display"] = 'block';
+  };
+}
+function update(piface) {
+  for (var i=0; i<8; i++) {
+    // input
+    if (piface['in'][i] == '0') {
+      document.getElementById('in_' + i).style["background"] = "#6C4A7C";
+      document.getElementById('in_' + i+ '_state').innerHTML = "Off";
+    }
+    else {
+      document.getElementById('in_' + i).style["background"] = "#2bb563";
+      document.getElementById('in_' + i+ '_state').innerHTML = "On";
+    }
+    // output
+    if (piface['out'][i] == '0') {
+      document.getElementById('out_' + i).style["background"] = "#6C4A7C";
+      document.getElementById('out_' + i+ '_state').innerHTML = "Off";
+    }
+    else {
+      document.getElementById('out_' + i).style["background"] = "#2bb563";
+      document.getElementById('out_' + i+ '_state').innerHTML = "On";
+    }
+  }
+}
+</script>
+<!--codi per a que quan es premi el botó s'enviï l'ordre d'engegar sortides-->
+<object align="center">     <embed wmode="transparent" src="https://demanda.ree.es/demanda.html" width="100%" height="770"  /></object> <!--portem el gràfic del consum en moment real d'electricitat-->
+        <div class="textaso";>
+                    Okei, so here I am gonna write what I've been doing all these days that I've been working on this project. First of all, I set up the Raspberry Pi. It was a little bit tricky at the beggining because of my inexperience, and because a keybord didn't work well. I managed to copy the noobs folder in my SD (8GB) and then to install the system in my board. As it was my first time, I didn't select the option "language" to "es". The default one was "gb", I think. Because of that, all the letters worked well, but not the other characters. Not even "-" or ".". I had to search on the Internet for a solution. I had to modify a file, where I could set the keyboard language. The following times that I reset the board and install the OS, I simply selected the option "language: es". The first times, I didnt know what to do with the raspi-config menu that you see at the begginning, the first time you power the Raspberry with the OS installed. After enabling some options, i finally entered in the interface, using startx. Once there, and as I was far from the router, I tried to set up a WIFI dongle, but it didn't work. It detected me my home router, but no way to connect to it. I wanted to solve this problem, so I moved the Raspberry to my router, so I could use an Ethernet cable. Once done this, I worked with python. I followed some video tutorials, which were pretty fast, but I learned something. They showed the basics and not so basics of python. At the begginning I thought I had to learn to code, more than anything else. I also followed the online book "Learn python the hard way.". I did 25 tutorials of 60, and repeated them. Then, I realised that I was "moviendo sin avanzar", so I had to reestablish my goals and way of working. I started doing some more useful staff. I bought the PiFace Digital, a very nice shield that owns 8 inputs and 8 outputs (with some leds), and two relays. I don't know if it was cheap, but it has helped me to solve a lot of troubles and to work more elegant. I could use a board with a lot of holes and connect it to some Raspberry Pi pins, which is not really elegant and nice, to work with and to see. I made simple codes for the shield. Like, for example, blink a led, or more than led. I also worked with the inputs, if an input button was pressed, a led would change from off to on. I can explain the code, like what to import, or what to write in order to refer to and input or ouptut, which number and which state; but the objective of this text is to remember all, then I will explain with more detail what I did. The following things that I did was to start finding something more useful. I focused on whatsapp and telegram because I thought it would be cool to use an app that everyone uses, so it would be very easy to communicate with my board. When I was finding information about this, the campus was going to start. There, even thought I had to share my tutor with another guy, and that the tutor always left and hour before he should, I learned a lot. He thaught me some very weird concepts, that I had never realised that they existed, and nowadays I don't understand most of them. I felt like it was everything very theoric. And Antoni told me he has practical, I couldn't believe that. He talked about this protocol and this other, how the communication worked, but I wasn't interested in that. I only wanted to use my Raspberry for a cool project. Anyways, he thought me the basics of linux, we configured Telegram (Whatsapp had too many versions and wasn't addapted to applications like the one i wanted to run. Or that was what the clever University monsieurs told me. I didn't want to prove them wrong). We configured Telegram, and even thought i had to write first from the Raspberry, the communication was cool, and i managed to being replied with a message if mine was the one that i had set up. Or even a photo. It is also possible to control the GPIO, but tricky and I was using the PiFace. As it wasn't as cool as I thought, or useful, doesnt matter, I found more interesting information. I have to remember you that my project was about finding for some information, trying to applie it, and search for more information. We managed to install the adcomp software, which uses json and tornado for controling my dear board via web. Antoni didn't know what those two softwares where, but he liked the idea that I was controling my board via web, which was something very generic. Once done that, the two campus had passed. We comunicated via email.Once done that, I went to the enterprise, AMP. It was an OK experience. The best part of it was the worker that I first saw: Pau Catalan. He was the antitesis of the University teachers. He told me that he had done some interesting projects on Raspberry, and that he now works with Arduine (more professional. Arduino and Raspberry are like C and python. The first ones are always one step better than the others). He knew everything about these boards, he was the true genius. And the best part of it was that he was opened to all my doubts, and he always answered my emails the best way he could. With him I managed to open my router's ports, in order to allow the remote communication. In the university we tried this, and worked with a new router (not from any Movistar or company like this). Every day I worked 7 hours there, so I didn't have much time for my project. But the hours that I hadn't to do some jobs, I practiced html and css. I followed a html book, which was really long and not really useful. I finally started to follow some YT tutorials, very fast and well-explained. The lasts days I made a little bit of css. When I left the enterprise, my camera arrived, so I started to work with it. I havent done a timelapse, but I worked with some scripts that took a photo every x seconds during x time. I could upload them to my apache folder. And then download them with an extensions. Then I realised that I could stream, so I tried it. There where some very cool streams available, like motion pi. Some didnt work with the module, so I used an old webcam, which worked really well. I managed to stream remotely with motion pie, which took al the board, and with the webcam. I had to see the stream with Firefox because google chrome has a bug, and IE is shit. Safari only worked for the computer, and Firefox also for my phone. After this, I was a little bit stuck. I looked for sensors, and for a new wifi dongle. Between this I had gone some days on holidays, and there had been the FM. The sensors were expensive or not reliable. And the dongle arrived, but didn't worked. Once done all of these, my father and I have been searching for a cool app, without success yet. I also created a simple refrigerator, or whatever, by taking a 230V cable and by connecting the red and black cables to the red and black cables of the regrigerator. It was a part of a refrigerator for my AMP micro. My father let me try a driver, or that how he calls a small board that allowed me to make an engine turn like a clock or in the contrary direction by using to outputs that I could control via me dear web. This sentence is shit, my english is not in his best state, sry. Those lasts days, I've been working on the html page. It looks pretty cool now. The web has got, more or less, a responsive design. It could be improved but I'm quite satisfied with the results of the webpage. I've just installed apache, and i've been working with a servo and a simple program that made it rotate x degrees. The problem with that was that it needed a lot of power, or at least the RPi turned down after a few seconds of running the code. I'm looking forward to keep the fpaez links, because at the moment saved.io is not working properly. I have to keep working on it, and to try a responsive design. Once finished, I will try to do a timelapse, to take the photos and keep them together with a PC software. I will also install Apache, and I will be thinking of an app. I've already done that. The responsive design is able on the socket.html and also on the mcpphp.php, which displays me the temperature, light, and potencia. Ive also added some comments. By setting a maxwidht and widht=100% ive got the responsive. Ïve set up the mcp3008 which works pretty fine. i installed some drivers and used a good code. By decomenting some lines i can read all 8 channels. The info is directly written on a text file, and php takes the data from this file. I am also using a temperature sensor, which is digital and lighting a led if the temperature is over x degrees. Ive paid, also, attention on the hostname. <b>Now i should: get the PiRack and work with him (connect the PiFace, the mcp and the digital sensors.). I should be able to control multiple outputs (8 from webpage, 24 from python code by using the instruction x pin 0/1state of 1/2/3/4 device.)I will change the mcp code and it will easily set up correctly. I will maybe struggle with the digital sensors. I have to connect the dht11 sensor and read, a few others. Also test digital sensors with the PiFace outputs.</b>
+                  </div>
+                
+<!--<a href="http://www.raspberrypi.org">
+  <img src="https://www.raspberrypi.org/wp-content/uploads/2015/08/raspberry-pi-logo.png" alt="HTML tutorial" style="width:100px;height:100px;border:0">-->
+</a>
+</body>
+</html>

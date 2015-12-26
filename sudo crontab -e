@@ -1,0 +1,9 @@
+# /1 * * * * /usr/bin/python /var/www/x.py
+# /1 * * * * /usr/bin/python /home/pi/Desktop/test.py
+# /1 * * * * /usr/bin/python3 /var/www/x.py
+
+@reboot sh /home/pi/script/launcher.sh >/home/pi/logs/cronlog 2>&1
+@reboot sh /home/pi/piface-python-websocket-server/launcher.sh >/home/pi/logs/cronglog 2>&1
+*/1 * * * * /home/pi/script/launcher.sh >/home/pi/logs/cronlog.log 2>&1
+@reboot sh /home/pi/script/launchermcp.sh >/home/pi/logs/cronlog 2>&1
+@reboot sh /home/pi/script/launchertemp.sh >/home/pi/logs/cronlog 2>&1
